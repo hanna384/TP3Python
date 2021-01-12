@@ -92,6 +92,9 @@ class vaisseaux:
         xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
         if xHG>0 :
             monCanvas.move(self.id,dx,dy)
+    
+    def lancerMissile(self, event):
+        print('helloworld')
 
 
 #fonction principal du jeu
@@ -109,14 +112,11 @@ def new_game():
     vaisseau1 = vaisseaux()
     print(vaisseau1.id)
 
-    #vaisseau1.bind("<KeyPress-Left>", lambda e: gfg.left(e)) 
-    #monCanvas.bind("<Right>",mooveRight)
-    # vaisseau1.bind("<Left>",mooveLeft)
-    # vaisseau1.bind("<space>",tirer)
     # vaisseau1.bind("<KeyPress-Right>", mooveRight)
     monCanvas.focus_set()
     monCanvas.bind("<Right>",vaisseau1.mooveRight)
     monCanvas.bind("<Left>",vaisseau1.mooveLeft)
+    monCanvas.bind("<space>",vaisseau1.lancerMissile)
     
 
     
