@@ -3,7 +3,7 @@
 # lien gitHub    https://github.com/hanna384/TP3Python.git
 # ToDo : 
 # mettre repo en public
-# 
+# lancer du misssile : créer un canvas (missile) dans la méthode lancerMissile
 #puis créer un tableau d'ennemies j'imagine
 # 
 
