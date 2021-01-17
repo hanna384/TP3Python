@@ -2,20 +2,19 @@
 # programme écrit par Hanna Albala
 # lien gitHub    https://github.com/hanna384/TP3Python.git
 # ToDo : 
-# mettre repo en public
-# lancer du misssile : créer un canvas (missile) dans la méthode lancerMissile
-#puis créer un tableau d'ennemies j'imagine
-# 
+# Lorsqu'un missile rencontre un ennemie, les deux doivents etre détruit
+# gerer les vies restantes et le score
 
-#from tkinter import Tk, Label, Button, PhotoImage, Canvas, Menu
-from tkinter import *
-from SpaceIvadersTools import *
+from tkinter import Tk, Label, Button, PhotoImage, Canvas, Menu
+#from tkinter import *
+#from SpaceIvadersTools import *  #finalement j'ai mis mes fonctions et le programme principal dans un seul fichier
 import random
 
 
 # classe des objets ennemies
 #contient une position horizontal X et vertical Y générés aléatoirement
 #contient un sens de déplacement initié à droite ->1
+#contient l'id du widget crée
 #contient une méthode de création du widget ennemi
 #contient une méthode pour déplacer les ennemis
 class ennemis:
@@ -31,20 +30,26 @@ class ennemis:
         r=45
         #cercle de centre (posX,posY) et de rayon r
         id_ennemi=monCanvas.create_oval(self.posX, self.posY, self.posX+r, self.posY+r, outline='red', fill='red', tag='aliens')
-        print (monCanvas.find_all())
-        print (id_ennemi)
+        # print (monCanvas.find_all())
+        # print (id_ennemi)
         #retourne l'id du widget (a l'interieur de monCanvas)
         return id_ennemi
     def deplacement(self):
         # recupère la coordonnées du point haut-gauche et bas-droite du rectangle imaginaire tracé autour de tous les aliens
-        xHG, yHG, xBD, yBD=monCanvas.bbox('aliens')
-        #modifier le sens de déplacement si besoin
-        if xBD >700 or xHG<0:
-            self.direction*=-1
-        dx=1
-        dy=0
-        monCanvas.move(self.id,dx*self.direction,dy)
-        myWindow.after(40,self.deplacement)
+        listeAliens=monCanvas.find_withtag('aliens')
+        if listeAliens:
+            xHG, yHG, xBD, yBD=monCanvas.bbox('aliens')
+            dx=3
+            dy=0
+            #modifier le sens de déplacement si dépasse bords canvas
+            if yBD>=415: #si atteint 415 c-a-d le haut du vaisseau : à améliorer, transmettre la coordonnée
+                gameOver()
+            else:
+                if xBD >700 or xHG<0:
+                    self.direction*=-1
+                    dy=30
+                monCanvas.move(self.id,dx*self.direction,dy)
+                myWindow.after(40,self.deplacement)
         #if monCanvas.coords(balle)
         
 
@@ -53,24 +58,26 @@ class ennemis:
 
 
 # classe de l'objet vaisseau
+#contient des coordonnées initiales   
 #contient une méthode de création du widget vaisseau
 #contient deux méthodes pour déplacer le vaisseau à droite et à gauche
 class vaisseaux:
     
     def __init__(self):
+        #coordonnées d'origine
+        self.x0=325
+        self.y0=415
+        self.x1=375
+        self.y1=415
+        self.y1=415
+        self.x2=390
+        self.y2=445
+        self.x3=310
+        self.y3=445
         self.id=self.creationVaisseau()
     def creationVaisseau(self):
-        #coordonnées d'origine
-        x0=325
-        y0=415
-        x1=375
-        y1=415
-        x2=390
-        y2=445
-        x3=310
-        y3=445
         #polygone de coordonnées x0,x1,y0,y1
-        id_vaisseau=monCanvas.create_polygon(x0,y0,x1,y1,x2,y2,x3,y3, outline='blue', fill='blue',tag='monVaisseau')
+        id_vaisseau=monCanvas.create_polygon(self.x0,self.y0,self.x1,self.y1,self.x2,self.y2,self.x3,self.y3, outline='blue', fill='blue',tag='monVaisseau')
         #retourne l'id du widget (a l'interieur de monCanvas)
         return id_vaisseau
     def mooveRight(self, event):
@@ -90,16 +97,54 @@ class vaisseaux:
         dx=-5
         dy=0
         xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
+        #print(xHG, yHG, xBD, yBD)
         if xHG>0 :
             monCanvas.move(self.id,dx,dy)
     
-    def lancerMissile(self, event):
-        print('helloworld')
+    
+#  classe des objets missiles
+#contient des coordonnées initiales 
+#contient l'id du missile 
+#contient une methode de création du missile
+#contient une methode de déplacement du missile   
+class missiles : 
+    def __init__(self):
+        l=2 #demi largeur missile
+        h=20#hauteur du missile
+        xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
+        #print(xHG, yHG, xBD, yBD)
+        self.x0=xHG +(xBD-xHG)/2 -l
+        self.x1=xHG +(xBD-xHG)/2 +l
+        self.y0=yHG +h
+        self.y1=yHG
+        self.id=self.CreationMissile()
+        #print(self.id)
+        self.deplacementMissile()
+    def CreationMissile(self):
+        id_missile=monCanvas.create_rectangle(self.x0,self.y0,self.x1,self.y1,outline='white', fill='white',tag='missile')
+        return id_missile
+    def deplacementMissile(self):
+        # recupère la coordonnées y bas-droite du missile 
+        xHG, yHG, xBD, yBD=monCanvas.bbox(self.id)
+        if yBD <0:
+            monCanvas.delete(self.id)
+        else:
+            dx=0
+            dy=-20
+            monCanvas.move(self.id,dx,dy)
+            myWindow.after(40,self.deplacementMissile)  
 
+def gameOver():
+    monCanvas.delete('all') 
+    creerImageGameOver()
+         
+        
+def createMissile(event):
+    missiles()
 
 #fonction principal du jeu
 def new_game():
-    nombreEnnemis=12
+    nombreEnnemis=10
     
     #supprime tout ce qui est contenu dans monCanvas(c-a-d les ennemis mais egalement l'image de fond)
     monCanvas.delete('all')
@@ -110,13 +155,17 @@ def new_game():
         ennemis()
 
     vaisseau1 = vaisseaux()
-    print(vaisseau1.id)
+    #print(vaisseau1.id)
 
-    # vaisseau1.bind("<KeyPress-Right>", mooveRight)
     monCanvas.focus_set()
     monCanvas.bind("<Right>",vaisseau1.mooveRight)
     monCanvas.bind("<Left>",vaisseau1.mooveLeft)
-    monCanvas.bind("<space>",vaisseau1.lancerMissile)
+    monCanvas.bind("<space>",createMissile)
+
+    
+
+
+    
     
 
     
@@ -139,13 +188,22 @@ labelLives.grid(row=0, column=1)
 #labelLives.pack(side= 'top')
 
 photo = PhotoImage(file = "terre.gif")
+photo1 = PhotoImage(file = "game_over.gif")
+photo2 = PhotoImage(file = "logo.gif")
 largeur = 700 
 hauteur = 445
 monCanvas = Canvas(myWindow, width = largeur, height =hauteur)
+# a ameliorer pour ne pas reperter la fonction 3 fois, mais si je met le photo = PhotoImage(file = ... dans la fonction ca ne marche pas
 def creerImageFond():
-    item = monCanvas.create_image(0,0 , anchor ='nw' , image = photo)
-creerImageFond()
+    monCanvas.create_image(0,0 , anchor ='nw' , image = photo)
+def creerImageGameOver():
+    monCanvas.create_image(0,0 , anchor ='nw' , image = photo1)
+def creerImageBienvenue():
+    monCanvas.create_image(0,0 , anchor ='nw' , image = photo2)
+creerImageBienvenue()
 monCanvas.grid(row=1, column= 0)
+
+
 
 
 buttonNewGame = Button (myWindow, text="New Game", command = new_game)
