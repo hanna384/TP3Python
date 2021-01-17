@@ -86,9 +86,11 @@ class vaisseaux:
         dx=5
         dy=0
         # recupèrer la coordonnées du point en bas à droite du rectangle imaginaire tracé autour de ma forme
-        xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
-        if xBD<700 :
-            monCanvas.move(self.id,dx,dy)
+        listeVaisseau=monCanvas.find_withtag('monVaisseau')
+        if listeVaisseau: #si mon vaisseau existe
+            xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
+            if xBD<700 :
+                monCanvas.move(self.id,dx,dy)
         
         #if monCanvas.coords(balle)
         #bbox pour les aliens utiliser un tag alien a declarer dans les options de create oval pour creer une boite autour de tous les aliens pour qu'ils reviennent
@@ -97,10 +99,12 @@ class vaisseaux:
         # se deplacer de 5 pixels à gauche
         dx=-5
         dy=0
-        xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
-        #print(xHG, yHG, xBD, yBD)
-        if xHG>0 :
-            monCanvas.move(self.id,dx,dy)
+        listeVaisseau=monCanvas.find_withtag('monVaisseau')
+        if listeVaisseau: #si mon vaisseau existe
+            xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
+            #print(xHG, yHG, xBD, yBD)
+            if xHG>0 :
+                monCanvas.move(self.id,dx,dy)
     
     
 #  classe des objets missiles
@@ -112,15 +116,17 @@ class missiles :
     def __init__(self):
         l=2 #demi largeur missile
         h=20#hauteur du missile
-        xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
-        #print(xHG, yHG, xBD, yBD)
-        self.x0=xHG +(xBD-xHG)/2 -l
-        self.x1=xHG +(xBD-xHG)/2 +l
-        self.y0=yHG +h
-        self.y1=yHG
-        self.id=self.CreationMissile()
-        #print(self.id)
-        self.deplacementMissile()
+        listeVaisseau=monCanvas.find_withtag('monVaisseau')
+        if listeVaisseau: #si mon vaisseau existe
+            xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
+            #print(xHG, yHG, xBD, yBD)
+            self.x0=xHG +(xBD-xHG)/2 -l
+            self.x1=xHG +(xBD-xHG)/2 +l
+            self.y0=yHG +h
+            self.y1=yHG
+            self.id=self.CreationMissile()
+            #print(self.id)
+            self.deplacementMissile()
     def CreationMissile(self):
         id_missile=monCanvas.create_rectangle(self.x0,self.y0,self.x1,self.y1,outline='white', fill='white',tag='missile')
         return id_missile
