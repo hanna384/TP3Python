@@ -2,13 +2,12 @@
 # programme écrit par Hanna Albala
 # lien gitHub    https://github.com/hanna384/TP3Python.git
 # ToDo : 
-# Lorsqu'un missile rencontre un ennemie, les deux doivents etre détruit
+# Lorsqu'un missile rencontre un ennemie, les deux doivents etre détruit : recuperer la liste des aliens actifs
 # gerer les vies restantes et le score
 #ameliorer les fonctions d'affichage photo fond
 
 from tkinter import Tk, Label, Button, PhotoImage, Canvas, Menu
 #from tkinter import *
-#from SpaceIvadersTools import *  #finalement j'ai mis mes fonctions et le programme principal dans un seul fichier
 import random
 
 
@@ -200,7 +199,7 @@ photo2 = PhotoImage(file = "logo.gif")
 largeur = 700 
 hauteur = 445
 monCanvas = Canvas(myWindow, width = largeur, height =hauteur)
-# a ameliorer pour ne pas reperter la fonction 3 fois, mais si je met le photo = PhotoImage(file = ... dans la fonction ca ne marche pas
+# a ameliorer pour ne pas repeter la fonction 3 fois, mais si je met le photo = PhotoImage(file = ... dans la fonction ca ne marche pas
 def creerImageFond():
     monCanvas.create_image(0,0 , anchor ='nw' , image = photo)
 def creerImageGameOver():
@@ -218,14 +217,6 @@ buttonNewGame.grid(row=1, column=1)
 
 buttonQuit = Button (myWindow, text="Quitter", command = myWindow.destroy)
 buttonQuit.grid(row=2, column=1)
-
-#création du menu
-# menu = Menu(myWindow) 
-# monMenu = Menu(menu, tearoff = 0)   
-# monMenu.add_command(label="Quit", command = myWindow.destroy) 
-# monMenu.add_command(label="TEST", command = myWindow.destroy)  
-  
-# myWindow.config(menu = menu) 
 
 
 
