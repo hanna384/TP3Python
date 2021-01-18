@@ -156,9 +156,13 @@ class joueurs :
         self.lives=3
         self.pointsWon=0
     def perdreUneVie(self):
-        self.lives-=1  
+        self.lives-=1
+        #changer l'affichage du nb de vies
+        labelLives.config(text='Lives' + str(self.lives))  
     def gagnerPoints(self):
-        self.pointsWon+=2          
+        self.pointsWon+=2 
+        #changer l'affichage du nb de points
+        labelScore.config(text='Score : ' + str(self.pointsWon))         
 
 def gameOver():
     monCanvas.delete('all') 
@@ -208,10 +212,12 @@ myWindow.geometry('800x500')
 
 
 labelScore = Label(myWindow, text = "Score : ")
+labelScore.config(text='Score : ' + '0')
 labelScore.grid(row=0, column=0)
 #labelScore.pack(side= 'top')
 
-labelLives = Label(myWindow, text = "Lives : ")
+labelLives = Label(myWindow)
+labelLives.config(text='Lives : ' + '3')
 labelLives.grid(row=0, column=1)
 #labelLives.pack(side= 'top')
 
