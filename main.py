@@ -3,7 +3,7 @@
 # lien gitHub    https://github.com/hanna384/TP3Python.git
 # ToDo : 
 # 
-# mettre le temps entre lancers des aliens en aléatoire
+# mettre le temps entre les lancers des aliens en aléatoire
 #mettre des ilots de protection
 #ameliorer les fonctions d'affichage photo fond
 
@@ -168,6 +168,9 @@ class missiles :
                 if self.tagAdversaire=='aliens': #si c'est le vaisseau qui touche un alien
                     monCanvas.delete(i,self.id)
                     self.joueur.gagnerPoints()
+                    listeAdversaires=monCanvas.find_withtag(self.tagAdversaire)
+                    if not(listeAdversaires):
+                        YouWon()
                 elif self.tagAdversaire=='monVaisseau': #si c'est un alien qui touche mon vaisseau
                     self.joueur.perdreUneVie()
 
@@ -189,6 +192,10 @@ class joueurs :
 def gameOver():
     monCanvas.delete('all') 
     creerImageGameOver()
+
+def YouWon():
+    monCanvas.delete('all') 
+    creerImageYouWon()
          
         
 def createMissile(event, joueur, adversaire):
@@ -250,6 +257,7 @@ labelLives.grid(row=0, column=1)
 photo = PhotoImage(file = "terre.gif")
 photo1 = PhotoImage(file = "game_over.gif")
 photo2 = PhotoImage(file = "logo.gif")
+photo3 = PhotoImage(file = "won.gif")
 largeur = 700 
 hauteur = 445
 monCanvas = Canvas(myWindow, width = largeur, height =hauteur)
@@ -260,6 +268,8 @@ def creerImageGameOver():
     monCanvas.create_image(0,0 , anchor ='nw' , image = photo1)
 def creerImageBienvenue():
     monCanvas.create_image(0,0 , anchor ='nw' , image = photo2)
+def creerImageYouWon():
+    monCanvas.create_image(0,0 , anchor ='nw' , image = photo3)
 creerImageBienvenue()
 monCanvas.grid(row=1, column= 0)
 
