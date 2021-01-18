@@ -2,8 +2,8 @@
 # programme écrit par Hanna Albala
 # lien gitHub    https://github.com/hanna384/TP3Python.git
 # ToDo : 
-# Lorsqu'un missile rencontre un ennemie, les deux doivents etre détruit : recuperer la liste des aliens actifs
-# gerer les vies restantes et le score
+# gerer affichage des points gagnés
+# créer missiles contre le vaisseau pour perdre des vies
 #ameliorer les fonctions d'affichage photo fond
 
 from tkinter import Tk, Label, Button, PhotoImage, Canvas, Menu
@@ -23,16 +23,15 @@ class ennemis:
         self.posX=random.randint(0,350)
         self.posY=random.randint(0,200)
         self.direction=1
+        #r rayon du cercle ennemi
+        self.r=45
         self.id=self.creationEnnemi()
         self.deplacement()
     def creationEnnemi(self):
-        #r rayon du cercle ennemi
-        r=45
         #cercle de centre (posX,posY) et de rayon r
-        id_ennemi=monCanvas.create_oval(self.posX, self.posY, self.posX+r, self.posY+r, outline='red', fill='red', tag='aliens')
+        id_ennemi=monCanvas.create_oval(self.posX, self.posY, self.posX+self.r, self.posY+self.r, outline='red', fill='red', tag='aliens')
         # print (monCanvas.find_all())
-        # print (id_ennemi)
-        #retourne l'id du widget (a l'interieur de monCanvas)
+        #retourne l'id du widget (de monCanvas)
         return id_ennemi
     def deplacement(self):
         # recupère la coordonnées du point haut-gauche et bas-droite du rectangle imaginaire tracé autour de tous les aliens
@@ -109,19 +108,21 @@ class vaisseaux:
 #  classe des objets missiles
 #contient des coordonnées initiales 
 #contient l'id du missile 
+#contient l'objet joueur
 #contient une methode de création du missile
 #contient une methode de déplacement du missile   
 class missiles : 
-    def __init__(self):
-        l=2 #demi largeur missile
-        h=20#hauteur du missile
+    def __init__(self, joueur1):
+        self.l=2 #demi largeur missile
+        self.h=20#hauteur du missile
+        self.joueur= joueur1 #recupère l'objet joueur
         listeVaisseau=monCanvas.find_withtag('monVaisseau')
         if listeVaisseau: #si mon vaisseau existe
             xHG, yHG, xBD, yBD=monCanvas.bbox('monVaisseau')
             #print(xHG, yHG, xBD, yBD)
-            self.x0=xHG +(xBD-xHG)/2 -l
-            self.x1=xHG +(xBD-xHG)/2 +l
-            self.y0=yHG +h
+            self.x0=xHG +(xBD-xHG)/2 -self.l
+            self.x1=xHG +(xBD-xHG)/2 +self.l
+            self.y0=yHG +self.h
             self.y1=yHG
             self.id=self.CreationMissile()
             #print(self.id)
@@ -130,23 +131,43 @@ class missiles :
         id_missile=monCanvas.create_rectangle(self.x0,self.y0,self.x1,self.y1,outline='white', fill='white',tag='missile')
         return id_missile
     def deplacementMissile(self):
-        # recupère la coordonnées y bas-droite du missile 
-        xHG, yHG, xBD, yBD=monCanvas.bbox(self.id)
-        if yBD <0:
-            monCanvas.delete(self.id)
-        else:
-            dx=0
-            dy=-20
-            monCanvas.move(self.id,dx,dy)
-            myWindow.after(40,self.deplacementMissile)  
+        listeMissiles=monCanvas.find_withtag(self.id)
+        if listeMissiles: #si il y a des missiles existants
+            # recupère la coordonnées y bas-droite du missile 
+            xHG, yHG, xBD, yBD=monCanvas.bbox(self.id)
+            if yBD <0:
+                monCanvas.delete(self.id)
+            else:
+                dx=0
+                dy=-20
+                monCanvas.move(self.id,dx,dy)
+                self.checkIfMeetAlien(xHG, yHG, xBD, yBD)#verifie si le missile rencontre un alien, si oui, détruit le missile et l'alien
+                myWindow.after(40,self.deplacementMissile) 
+    def checkIfMeetAlien(self,xHG_Mi, yHG_Mi, xBD_Mi, yBD_Mi):
+        listeAliens=monCanvas.find_withtag('aliens')
+        for i in listeAliens:
+            xHG, yHG, xBD, yBD=monCanvas.bbox(i)
+            if ((yHG_Mi>=(yBD-40))and(yHG_Mi<=yBD)) and ((xHG_Mi>=xHG)and(xHG_Mi<=(xBD-2*self.l))):
+                monCanvas.delete(i,self.id)
+                self.joueur.gagnerPoints()
+
+class joueurs :
+    def __init__(self):
+        self.lives=3
+        self.pointsWon=0
+    def perdreUneVie(self):
+        self.lives-=1  
+    def gagnerPoints(self):
+        self.pointsWon+=2          
 
 def gameOver():
     monCanvas.delete('all') 
     creerImageGameOver()
          
         
-def createMissile(event):
-    missiles()
+def createMissile(event, joueur):
+    missiles(joueur)
+   
 
 #fonction principal du jeu
 def new_game():
@@ -156,22 +177,23 @@ def new_game():
     monCanvas.delete('all')
     creerImageFond() #on réafiche l'image de fond
 
+    #instancier le joueur
+    joueur1= joueurs()
+
     #instancier les ennemis
     for n in range(nombreEnnemis):
         ennemis()
 
     vaisseau1 = vaisseaux()
-    #print(vaisseau1.id)
 
     monCanvas.focus_set()
     monCanvas.bind("<Right>",vaisseau1.mooveRight)
     monCanvas.bind("<Left>",vaisseau1.mooveLeft)
-    monCanvas.bind("<space>",createMissile)
+    monCanvas.bind("<space>",lambda event: createMissile(event, joueur1)) #syntaxe différente car on transmet un parametre joueur1
 
     
 
-
-    
+  
     
 
     
